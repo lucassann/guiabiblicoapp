@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password_hash String
+  role          String    @default("USER")
+  avatarId      String?
+  streakDays    Int       @default(0)
+  lastLoginDate DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Book {
+  id       Int       @id @default(autoincrement())
+  name     String
+  abbrev   String    @unique
+  chapters Chapter[]
+
+  @@map("books")
+}
+
+model Chapter {
+  id      Int     @id @default(autoincrement())
+  number  Int
+  bookId  Int
+  book    Book    @relation(fields: [bookId], references: [id])
+  verses  Verse[]
+
+  @@map("chapters")
+}
+
+model Verse {
+  id        Int     @id @default(autoincrement())
+  number    Int
+  text      String
+  version   String  @default("nvi")
+  chapterId Int
+  chapter   Chapter @relation(fields: [chapterId], references: [id])
+
+  @@unique([chapterId, number, version])
+  @@map("verses")
+}
+
+model Commentary {
+  id         Int     @id @default(autoincrement())
+  bookAbbrev String
+  chapter    Int
+  verse      Int?
+  text       String
+
+  @@map("commentaries")
+}
+
+model Material {
+  id           String   @id @default(uuid())
+  title        String
+  description  String
+  image        String
+  isPremium    Boolean  @default(false)
+  price        String?
+  link         String
+  category     String   @default("GERAL")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("materials")
+}
+
+model DailyBread {
+  id             String   @id @default(uuid())
+  date           DateTime @unique
+  verseText      String   @db.Text
+  verseReference String
+  study          String   @db.Text
+  imageUrl       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("daily_breads")
+}

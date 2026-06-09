@@ -1,0 +1,14 @@
+src/features/auth/sign-in/components/user-auth-form.tsx(9,10): error TS6133: 'sleep' is declared but its value is never read.
+src/features/auth/sign-in/index.tsx(1,10): error TS6133: 'Link' is declared but its value is never read.
+src/features/daily-bread/components/daily-bread-columns.tsx(3,1): error TS6133: 'Badge' is declared but its value is never read.
+src/features/daily-bread/components/daily-bread-delete-dialog.tsx(27,37): error TS2339: Property 'title' does not exist on type '{ id: string; date: string; verseText: string; verseReference: string; study: string; createdAt: Date; updatedAt: Date; imageUrl?: string | null | undefined; }'.
+src/features/daily-bread/components/daily-bread-delete-dialog.tsx(51,45): error TS2339: Property 'title' does not exist on type '{ id: string; date: string; verseText: string; verseReference: string; study: string; createdAt: Date; updatedAt: Date; imageUrl?: string | null | undefined; }'.
+src/features/daily-bread/components/daily-bread-delete-dialog.tsx(72,53): error TS2339: Property 'title' does not exist on type '{ id: string; date: string; verseText: string; verseReference: string; study: string; createdAt: Date; updatedAt: Date; imageUrl?: string | null | undefined; }'.
+src/features/dashboard/components/recent-sales.tsx(1,34): error TS6133: 'AvatarImage' is declared but its value is never read.
+src/features/dashboard/index.tsx(16,1): error TS6133: 'Search' is declared but its value is never read.
+src/features/dashboard/index.tsx(19,1): error TS6133: 'Overview' is declared but its value is never read.
+src/features/users/components/users-columns.tsx(105,50): error TS2367: This comparison appears to be unintentional because the types '"ADMIN" | "VIP" | "USER" | "SUSPENDED"' and '"superadmin" | "admin" | "cashier" | "manager"' have no overlap.
+src/features/users/components/users-delete-dialog.tsx(5,1): error TS6133: 'showSubmittedData' is declared but its value is never read.
+src/features/users/index.tsx(13,1): error TS6133: 'fakeUsers' is declared but its value is never read.
+src/routes/__root.tsx(3,1): error TS6133: 'ReactQueryDevtools' is declared but its value is never read.
+src/routes/__root.tsx(4,1): error TS6133: 'TanStackRouterDevtools' is declared but its value is never read.
