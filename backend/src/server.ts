@@ -14,18 +14,19 @@ import { webhooksRoutes } from './routes/webhooks'
 import { materialsRoutes } from './routes/materials'
 import { uploadRoutes } from './routes/upload'
 import { dailyBreadRoutes } from './routes/daily-bread'
+import { bookmarksRoutes } from './routes/bookmarks'
 
 const app = fastify({ logger: true })
 
 app.register(cors, {
-  origin: '*', // Permitir todos em dev
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 })
 
 app.register(fastifyMultipart, {
   limits: {
-    fileSize: 10485760, // 10MB
+    fileSize: 10485760,
   }
 })
 
@@ -41,6 +42,7 @@ app.register(webhooksRoutes, { prefix: '/api/webhooks' })
 app.register(materialsRoutes, { prefix: '/api/materials' })
 app.register(uploadRoutes, { prefix: '/api/upload' })
 app.register(dailyBreadRoutes, { prefix: '/api/daily-bread' })
+app.register(bookmarksRoutes, { prefix: '/api/bookmarks' })
 
 const start = async () => {
   try {

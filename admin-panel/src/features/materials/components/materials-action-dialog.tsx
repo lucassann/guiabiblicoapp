@@ -31,6 +31,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { type Material } from '../data/schema'
 import { useAuthStore } from '@/stores/auth-store'
+import { useNavigate } from '@tanstack/react-router'
 
 const CATEGORIAS = [
   'GERAL',
@@ -51,7 +52,7 @@ const formSchema = z.object({
   image: z.string().min(1, 'A imagem é obrigatória.'),
   isPremium: z.boolean(),
   price: z.string().optional(),
-  link: z.string().min(1, 'O link é obrigatório.'),
+  link: z.string().optional(),
   category: z.string().optional(),
   isEdit: z.boolean(),
 })
@@ -70,6 +71,7 @@ export function MaterialsActionDialog({
   onOpenChange,
 }: MaterialActionDialogProps) {
   const { auth } = useAuthStore()
+  const navigate = useNavigate()
   const isEdit = !!currentRow
   const form = useForm<MaterialForm>({
     resolver: zodResolver(formSchema),
@@ -107,7 +109,7 @@ export function MaterialsActionDialog({
         await fetch(`http://localhost:3333/api/materials/${currentRow.id}`, {
           method: 'PUT',
           headers,
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             title: values.title,
             description: values.description,
             image: values.image,
@@ -117,8 +119,11 @@ export function MaterialsActionDialog({
             category: values.category
           }),
         })
+        form.reset()
+        onOpenChange(false)
+        window.location.reload()
       } else {
-        await fetch(`http://localhost:3333/api/materials`, {
+        const res = await fetch(`http://localhost:3333/api/materials`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -131,12 +136,15 @@ export function MaterialsActionDialog({
             category: values.category
           }),
         })
+        const data = await res.json()
+        form.reset()
+        onOpenChange(false)
+        if (data.material?.id) {
+          navigate({ to: `/materials/${data.material.id}` })
+        } else {
+          window.location.reload()
+        }
       }
-
-      form.reset()
-      onOpenChange(false)
-      // Recarregar a página para o MVP
-      window.location.reload()
     } catch (error) {
       console.error('Erro ao salvar material', error)
       alert('Erro ao salvar material')
@@ -258,12 +266,13 @@ export function MaterialsActionDialog({
                 name='link'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-end'>Link (Ação)</FormLabel>
+                    <FormLabel className='col-span-2 text-end'>Link externo</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='https://wa.me/...'
+                        placeholder='https://... (opcional)'
                         className='col-span-4'
                         {...field}
+                        value={field.value || ''}
                       />
                     </FormControl>
                     <FormMessage className='col-span-4 col-start-3' />

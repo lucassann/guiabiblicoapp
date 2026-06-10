@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
+  id            String     @id @default(uuid())
+  email         String     @unique
   password_hash String
-  role          String    @default("USER")
+  role          String     @default("USER")
   avatarId      String?
-  streakDays    Int       @default(0)
+  streakDays    Int        @default(0)
   lastLoginDate DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  bookmarks     Bookmark[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   @@map("users")
 }
@@ -63,18 +64,53 @@ model Commentary {
 }
 
 model Material {
-  id           String   @id @default(uuid())
+  id           String            @id @default(uuid())
   title        String
   description  String
   image        String
-  isPremium    Boolean  @default(false)
+  isPremium    Boolean           @default(false)
   price        String?
   link         String
-  category     String   @default("GERAL")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  category     String            @default("GERAL")
+  sections     MaterialSection[]
+  bookmarks    Bookmark[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
   @@map("materials")
+}
+
+model MaterialSection {
+  id          String            @id @default(uuid())
+  materialId  String
+  material    Material          @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      MaterialSection?  @relation("SectionHierarchy", fields: [parentId], references: [id])
+  children    MaterialSection[] @relation("SectionHierarchy")
+  title       String
+  content     String            @db.Text
+  sortOrder   Int               @default(0)
+  bookmarks   Bookmark[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("material_sections")
+}
+
+model Bookmark {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  materialId String
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  sectionId  String?
+  section    MaterialSection? @relation(fields: [sectionId], references: [id])
+  progress   Float    @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, materialId])
+  @@map("bookmarks")
 }
 
 model DailyBread {

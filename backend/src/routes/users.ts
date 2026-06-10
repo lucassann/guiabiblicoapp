@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { prisma } from '../lib/prisma'
+import bcrypt from 'bcryptjs'
 import { authenticate } from '../plugins/authenticate'
 
 export async function usersRoutes(app: FastifyInstance) {
@@ -88,7 +89,40 @@ export async function usersRoutes(app: FastifyInstance) {
     }
   })
 
-  // PUT /api/users/avatar (Update avatar)
+  // PUT /api/users/password (Change password)
+  app.put('/password', { preHandler: [authenticate] }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const userReq = (request as any).user
+      const userId = userReq.sub
+      const { currentPassword, newPassword } = request.body as { currentPassword: string; newPassword: string }
+
+      if (!currentPassword || !newPassword) {
+        return reply.status(400).send({ error: 'Senha atual e nova senha são obrigatórias' })
+      }
+      if (newPassword.length < 3) {
+        return reply.status(400).send({ error: 'Nova senha deve ter no mínimo 3 caracteres' })
+      }
+
+      const user = await prisma.user.findUnique({ where: { id: userId } })
+      if (!user) return reply.status(404).send({ error: 'Usuário não encontrado' })
+
+      const valid = await bcrypt.compare(currentPassword, user.password_hash)
+      if (!valid) return reply.status(400).send({ error: 'Senha atual incorreta' })
+
+      const password_hash = await bcrypt.hash(newPassword, 6)
+      await prisma.user.update({
+        where: { id: userId },
+        data: { password_hash }
+      })
+
+      return reply.send({ message: 'Senha alterada com sucesso' })
+    } catch (error) {
+      console.error(error)
+      return reply.status(500).send({ error: 'Erro ao alterar senha' })
+    }
+  })
+
+  // PUT /api/users/avatar
   app.put('/avatar', { preHandler: [authenticate] }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const userReq = (request as any).user

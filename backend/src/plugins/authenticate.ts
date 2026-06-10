@@ -18,7 +18,11 @@ export async function authenticate(request: FastifyRequest, reply: FastifyReply)
       return reply.status(401).send({ message: 'Token mal formatado' })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super-secret')
+    const jwtSecret = process.env.JWT_SECRET
+    if (!jwtSecret) {
+      return reply.status(500).send({ message: 'JWT_SECRET não configurado' })
+    }
+    const decoded = jwt.verify(token, jwtSecret)
     
     // Anexar informações do usuário à request, caso seja necessário nas rotas
     ;(request as any).user = decoded

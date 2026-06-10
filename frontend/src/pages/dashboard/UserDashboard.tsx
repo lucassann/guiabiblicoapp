@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, Search, Bell, BookOpen, MessageCircle, PlayCircle, Lock, Home, User, Flame, Trophy, Calendar, Share2, Download, Copy, Image as ImageIcon, Type, Award, RefreshCw } from 'lucide-react'
+import { LogOut, Search, Bell, BookOpen, MessageCircle, PlayCircle, Lock, Home, User, Flame, Trophy, Calendar, Share2, Download, Copy, Image as ImageIcon, Type, Award, RefreshCw, Bookmark } from 'lucide-react'
 import { toPng } from 'html-to-image'
 import { BibleReader } from './BibleReader'
+import { MaterialReader } from './MaterialReader'
+import { PasswordChangeModal, NotificationsModal } from './ProfileModals'
 
 export function UserDashboard() {
   const navigate = useNavigate()
@@ -14,6 +16,10 @@ export function UserDashboard() {
   const [showStudyModal, setShowStudyModal] = useState(false)
   const [showAvatarModal, setShowAvatarModal] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [readingMaterial, setReadingMaterial] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false)
 
   // Real user data with progress
   const [userProfile, setUserProfile] = useState<any>(null)
@@ -277,7 +283,7 @@ export function UserDashboard() {
       </header>
 
       <main style={{ maxWidth: '1000px', margin: '0 auto', padding: '24px' }}>
-        {activeTab === 'home' && (
+        {readingMaterial ? null : activeTab === 'home' && (
           <>
             {/* Search Bar */}
         <div style={{ 
@@ -288,9 +294,14 @@ export function UserDashboard() {
           <Search size={20} color="var(--text-secondary)" />
           <input 
             type="text" 
-            placeholder="Buscar livros, esboços ou estudos..." 
+            placeholder="Buscar materiais..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '16px', outline: 'none' }}
           />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '18px' }}>&times;</button>
+          )}
         </div>
 
         {/* Daily Bread (Pão Diário) */}
@@ -631,8 +642,13 @@ export function UserDashboard() {
           </div>
 
           {Object.entries(
-            materials.reduce((acc: any, material: any) => {
-              // Usa diretamente o tópico/categoria cadastrado no admin
+            materials
+              .filter((m: any) => {
+                if (!searchQuery) return true
+                const q = searchQuery.toLowerCase()
+                return m.title?.toLowerCase().includes(q) || m.description?.toLowerCase().includes(q) || m.category?.toLowerCase().includes(q)
+              })
+              .reduce((acc: any, material: any) => {
               const cat = material.category || 'GERAL';
               if (!acc[cat]) acc[cat] = [];
               acc[cat].push(material);
@@ -695,10 +711,10 @@ export function UserDashboard() {
                           Adquirir ({material.price || 'Premium'})
                         </a>
                       ) : (
-                        <a href={material.link} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '12px', background: 'var(--primary-color)', color: '#fff', textDecoration: 'none', borderRadius: '12px', fontWeight: 600, fontSize: '14px', transition: 'var(--transition)' }}>
+                        <button onClick={() => setReadingMaterial(material.id)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '12px', background: 'var(--primary-color)', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', transition: 'var(--transition)' }}>
                           <PlayCircle size={18} />
                           Acessar Material
-                        </a>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -712,7 +728,14 @@ export function UserDashboard() {
         </>
         )}
 
-        {activeTab === 'bible' && <BibleReader />}
+        {activeTab === 'bible' && !readingMaterial && <BibleReader />}
+
+        {readingMaterial && (
+          <MaterialReader
+            materialId={readingMaterial}
+            onBack={() => setReadingMaterial(null)}
+          />
+        )}
 
         {activeTab === 'profile' && (
           <div style={{ animation: 'fadeIn 0.3s ease' }}>
@@ -743,7 +766,7 @@ export function UserDashboard() {
               <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px', color: 'var(--text-primary)' }}>Configurações da Conta</h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: 'var(--bg-color)', borderRadius: '16px', cursor: 'pointer' }}>
+                <div onClick={() => setShowPasswordModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: 'var(--bg-color)', borderRadius: '16px', cursor: 'pointer' }}>
                   <div style={{ background: '#fef3c7', padding: '10px', borderRadius: '12px' }}>
                     <Lock size={20} color="#d97706" />
                   </div>
@@ -753,7 +776,7 @@ export function UserDashboard() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: 'var(--bg-color)', borderRadius: '16px', cursor: 'pointer' }}>
+                <div onClick={() => setShowNotificationsModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: 'var(--bg-color)', borderRadius: '16px', cursor: 'pointer' }}>
                   <div style={{ background: '#dbeafe', padding: '10px', borderRadius: '12px' }}>
                     <Bell size={20} color="#2563eb" />
                   </div>
@@ -778,8 +801,23 @@ export function UserDashboard() {
         )}
       </main>
 
+      {/* Modal Alterar Senha */}
+      {showPasswordModal && (
+        <PasswordChangeModal
+          onClose={() => setShowPasswordModal(false)}
+          token={localStorage.getItem('token') || ''}
+        />
+      )}
+
+      {/* Modal Notificações */}
+      {showNotificationsModal && (
+        <NotificationsModal
+          onClose={() => setShowNotificationsModal(false)}
+        />
+      )}
+
       {/* Bottom Navigation (PWA style) */}
-      <nav style={{ 
+      {!readingMaterial && <nav style={{ 
         position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--surface-color)', 
         padding: '16px 24px', display: 'flex', justifyContent: 'space-around', alignItems: 'center',
         boxShadow: '0 -4px 20px rgba(0,0,0,0.05)', zIndex: 20
@@ -800,7 +838,7 @@ export function UserDashboard() {
           <LogOut size={24} />
           <span style={{ fontSize: '12px', fontWeight: 500 }}>Sair</span>
         </div>
-      </nav>
+      </nav>}
     </div>
   )
 }

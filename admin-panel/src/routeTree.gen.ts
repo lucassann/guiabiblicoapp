@@ -31,6 +31,7 @@ import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedMaterialsMaterialIdIndexRouteImport } from './routes/_authenticated/materials/$materialId/index'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -150,6 +151,12 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMaterialsMaterialIdIndexRoute =
+  AuthenticatedMaterialsMaterialIdIndexRouteImport.update({
+    id: '/materials/$materialId/',
+    path: '/materials/$materialId/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/materials/': typeof AuthenticatedMaterialsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
+  '/materials/$materialId/': typeof AuthenticatedMaterialsMaterialIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
@@ -195,6 +203,7 @@ export interface FileRoutesByTo {
   '/materials': typeof AuthenticatedMaterialsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/materials/$materialId': typeof AuthenticatedMaterialsMaterialIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -220,6 +229,7 @@ export interface FileRoutesById {
   '/_authenticated/materials/': typeof AuthenticatedMaterialsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/materials/$materialId/': typeof AuthenticatedMaterialsMaterialIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/materials/'
     | '/settings/'
     | '/users/'
+    | '/materials/$materialId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/materials'
     | '/settings'
     | '/users'
+    | '/materials/$materialId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -291,6 +303,7 @@ export interface FileRouteTypes {
     | '/_authenticated/materials/'
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
+    | '/_authenticated/materials/$materialId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -463,6 +476,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/materials/$materialId/': {
+      id: '/_authenticated/materials/$materialId/'
+      path: '/materials/$materialId'
+      fullPath: '/materials/$materialId/'
+      preLoaderRoute: typeof AuthenticatedMaterialsMaterialIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -496,6 +516,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDailyBreadIndexRoute: typeof AuthenticatedDailyBreadIndexRoute
   AuthenticatedMaterialsIndexRoute: typeof AuthenticatedMaterialsIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedMaterialsMaterialIdIndexRoute: typeof AuthenticatedMaterialsMaterialIdIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -505,6 +526,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDailyBreadIndexRoute: AuthenticatedDailyBreadIndexRoute,
   AuthenticatedMaterialsIndexRoute: AuthenticatedMaterialsIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedMaterialsMaterialIdIndexRoute:
+    AuthenticatedMaterialsMaterialIdIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

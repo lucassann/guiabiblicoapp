@@ -52,9 +52,13 @@ export async function authRoutes(app: FastifyInstance) {
       return reply.status(401).send({ message: 'Credenciais inválidas' })
     }
 
+    const jwtSecret = process.env.JWT_SECRET
+    if (!jwtSecret) {
+      return reply.status(500).send({ message: 'JWT_SECRET não configurado' })
+    }
     const token = jwt.sign(
       { role: user.role },
-      process.env.JWT_SECRET || 'super-secret',
+      jwtSecret,
       { subject: user.id, expiresIn: '7d' }
     )
 

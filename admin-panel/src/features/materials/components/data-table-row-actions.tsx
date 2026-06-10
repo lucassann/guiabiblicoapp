@@ -1,6 +1,6 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { type Row } from '@tanstack/react-table'
-import { Trash2, Pen } from 'lucide-react'
+import { Trash2, Pen, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -10,6 +10,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useNavigate } from '@tanstack/react-router'
 import { type Material } from '../data/schema'
 import { useMaterials } from './materials-provider'
 
@@ -19,6 +20,7 @@ type DataTableRowActionsProps = {
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { setOpen, setCurrentRow } = useMaterials()
+  const navigate = useNavigate()
   return (
     <>
       <DropdownMenu modal={false}>
@@ -31,7 +33,18 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             <span className='sr-only'>Abrir menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-40'>
+        <DropdownMenuContent align='end' className='w-48'>
+          <DropdownMenuItem
+            onClick={() => {
+              navigate({ to: `/materials/${row.original.id}` })
+            }}
+          >
+            Gerenciar Conteúdo
+            <DropdownMenuShortcut>
+              <FileText size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
               setCurrentRow(row.original)
